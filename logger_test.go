@@ -6,6 +6,7 @@ package log
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 	"time"
 )
@@ -89,10 +90,10 @@ func TestLoggerPushPopProcessors(t *testing.T) {
 	if len(l.processors) != 2 {
 		t.Error("processor count mismatch")
 	}
-	if l.processors[0] != p2 {
+	if l.processors[0] != p1 {
 		t.Error("processor mismatch")
 	}
-	if l.processors[1] != p1 {
+	if l.processors[1] != p2 {
 		t.Error("processor mismatch")
 	}
 	l.PopProcessor()
@@ -115,10 +116,10 @@ func TestLoggerPushPopHandler(t *testing.T) {
 	if len(l.handlers) != 2 {
 		t.Error("processor count mismatch")
 	}
-	if l.handlers[0] != h2 {
+	if l.handlers[0] != h1 {
 		t.Error("processor mismatch")
 	}
-	if l.handlers[1] != h1 {
+	if l.handlers[1] != h2 {
 		t.Error("processor mismatch")
 	}
 	l.PopHandler()
@@ -142,6 +143,19 @@ func TestLoggerWithDefaultProcessor(t *testing.T) {
 	l.PushProcessor(p)
 	l.Debug("foobar")
 	if "foobar go.date=2009-11-10T23:00:00Z" != buffer.String() {
+		t.Error(buffer.String())
+	}
+}
+
+func TestLoggerWithJsonFormatter(t *testing.T) {
+	buffer := new(bytes.Buffer)
+	h1 := NewBufferHandler(buffer, DEBUG)
+	h1.SetFormatter(&JSONFormatter{})
+	l := NewLogger("channel")
+	l.PushHandler(h1)
+	l.Debug("foobar")
+	expected := `{"message":"foobar","level":7,"level_name":"DEBUG","channel":"channel","@timestamp"`
+	if !strings.Contains(buffer.String(), expected) {
 		t.Error(buffer.String())
 	}
 }

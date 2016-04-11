@@ -35,14 +35,14 @@ var Severities = map[Severity]string{
 
 // A record is a log message at a given time
 type Record struct {
-	Message   string                 // Text message of the log
-	Formatted string                 // Formatted version of the log (once all processors and formatters have done their jobs)
-	Level     Severity               // Severity level
-	LevelName string                 // Severity name
-	Channel   string                 // Logger's name
-	Time      time.Time              // Creation date
-	Context   interface{}            // Context set by logger's caller
-	Extra     map[string]interface{} // Extra values that can be added by Processors
+	Message   string                 `json:"message"`           // Text message of the log
+	Formatted string                 `json:"-"`                 // Formatted version of the log (once all processors and formatters have done their jobs)
+	Level     Severity               `json:"level"`             // Severity level
+	LevelName string                 `json:"level_name"`        // Severity name
+	Channel   string                 `json:"channel"`           // Logger's name
+	Time      time.Time              `json:"@timestamp"`        // Creation date
+	Context   interface{}            `json:"context,omitempty"` // Context set by logger's caller
+	Extra     map[string]interface{} `json:"extra,omitempty"`   // Extra values that can be added by Processors
 }
 
 func newRecord(level Severity, channel, message string, context interface{}) *Record {

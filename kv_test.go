@@ -60,17 +60,3 @@ func TestMarshalDeepStruct(t *testing.T) {
 		t.Error("Marhshal returned a wrong result")
 	}
 }
-
-func TestMarshalMap(t *testing.T) {
-	m, err := Marshal(map[string]interface{}{
-		"foo":  true,
-		"rune": 'c',
-		"bar":  time.Date(2006, 8, 24, 02, 30, 0, 0, time.UTC),
-	})
-	if err != nil {
-		t.Error("marshal failed.", err)
-	}
-	if string(m) != "foo=true\trune='c'\tbar=2006-08-24T02:30:00Z" {
-		t.Error("marshalisation is wrong")
-	}
-}

@@ -5,6 +5,7 @@
 package log
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -58,4 +59,18 @@ func (f *LineFormatter) Format(r *Record) {
 	)
 
 	r.Formatted = replacer.Replace(f.LineFormat)
+}
+
+type JSONFormatter struct{}
+
+func NewJSONFormatter() Formatter {
+	return &JSONFormatter{}
+}
+
+func (f *JSONFormatter) Format(r *Record) {
+	js, err := json.Marshal(r)
+	if err != nil {
+		return
+	}
+	r.Formatted = string(js)
 }

@@ -4,14 +4,10 @@
 
 package log
 
-import (
-	"fmt"
-	"sync"
-)
+import "fmt"
 
 // A logger will log records transformed by the default processors to a collection of handlers
 type Logger struct {
-	mu         sync.Mutex
 	Name       string
 	handlers   []HandlerInterface
 	processors []Processor
@@ -24,21 +20,13 @@ func NewLogger(name string) *Logger {
 
 // Push a handler to the handlers stack
 func (l *Logger) PushHandler(h HandlerInterface) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	handlers := make([]HandlerInterface, len(l.handlers))
-	copy(handlers, l.handlers)
-
-	l.handlers = []HandlerInterface{h}
-	l.handlers = append(l.handlers, handlers...)
+	l.handlers = append(l.handlers, h)
 }
 
 // Pop a handler from the handlers stack
 func (l *Logger) PopHandler() {
-	l.mu.Lock()
-	defer l.mu.Unlock()
 	if len(l.handlers) > 0 {
-		l.handlers = l.handlers[1:len(l.handlers)]
+		l.handlers = l.handlers[0 : len(l.handlers)-1]
 		return
 	}
 
@@ -47,32 +35,25 @@ func (l *Logger) PopHandler() {
 
 // Push a processor to the processor stack
 func (l *Logger) PushProcessor(p Processor) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	processors := make([]Processor, len(l.processors))
-	copy(processors, l.processors)
-
-	l.processors = []Processor{p}
-	l.processors = append(l.processors, processors...)
+	l.processors = append(l.processors, p)
 }
 
 // Pop a processor from the processor stack
 func (l *Logger) PopProcessor() {
-	l.mu.Lock()
-	defer l.mu.Unlock()
 	if len(l.processors) > 0 {
-		l.processors = l.processors[1:len(l.processors)]
+		l.processors = l.processors[0 : len(l.processors)-1]
 		return
 	}
 
 	panic("Processors stack is empty")
 }
 
+func AddRecord(level Severity, message string, context interface{}) {
+	DefaultLogger.AddRecord(level, message, context)
+}
+
 // Log string with specified severity
 func (l *Logger) AddRecord(level Severity, message string, context interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-
 	if !l.S(level) {
 		return
 	}
