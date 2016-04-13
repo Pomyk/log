@@ -4,16 +4,10 @@
 
 package log
 
-import (
-	"os"
-	"runtime"
-)
+import "runtime"
 
 // RuntimeProcessor adds some information about the current go runtime to a log record
 var RuntimeProcessor = NewProcessor(runtimeProcessor)
-
-// RuntimeProcessor adds hostname to a log record
-var HostnameProcessor = NewProcessor(hostnameProcessor())
 
 // A processor transforms a log records in whatever way it wants.
 // It is usefull to add extra information to a log record
@@ -38,11 +32,4 @@ func runtimeProcessor(r *Record) {
 	r.Extra["go.num_cpu"] = runtime.NumCPU()
 	r.Extra["go.version"] = runtime.Version()
 	r.Extra["go.num_goroutines"] = runtime.NumGoroutine()
-}
-
-func hostnameProcessor() func(*Record) {
-	host, _ := os.Hostname()
-	return func(r *Record) {
-		r.Extra["host"] = host
-	}
 }
