@@ -7,6 +7,16 @@ package log
 
 import "fmt"
 
+var defaultContext map[string]interface{}
+
+func SetDefaultContext(c map[string]interface{}) {
+	defaultContext = c
+}
+
+func GetDefaultContext() map[string]interface{} {
+	return defaultContext
+}
+
 // A logger will log records transformed by the default processors to a collection of handlers
 type Logger struct {
 	Name       string
@@ -57,6 +67,9 @@ func AddRecord(level Severity, message string, context interface{}) {
 func (l *Logger) AddRecord(level Severity, message string, context interface{}) {
 	if !l.S(level) {
 		return
+	}
+	if context == nil {
+		context = defaultContext
 	}
 
 	r := newRecord(level, l.Name, message, context)
